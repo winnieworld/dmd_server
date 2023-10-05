@@ -2,7 +2,9 @@ import {
   Body,
   Controller,
   Get,
+  Delete,
   Logger,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -10,41 +12,57 @@ import {
   UseInterceptors,
   UsePipes,
   ValidationPipe,
-} from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import { Board } from './boards.entity';
-import { BoardsService } from './boards.service';
-import { CreateBoardDto } from './dto/create-board.dto';
+} from "@nestjs/common";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { Board } from "./boards.entity";
+import { BoardsService } from "./boards.service";
+import { CreateBoardDto } from "./dto/create-board.dto";
 
 // @UseGuards(AuthGuard())
-@Controller('boards')
+@Controller("boards")
 export class BoardsController {
-  private logger = new Logger('Boards');
+  private logger = new Logger("Boards");
   constructor(private boardsService: BoardsService) {}
 
   @Get()
-  getAllBoard(@Query('page') page = 0) {
+  getAllBoard(@Query("page") page = 0) {
     this.logger.verbose(`get all boards`);
     return this.boardsService.getAllBoards(page);
   }
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files', 10)) // 10은 최대파일개수
+  @UseInterceptors(FilesInterceptor("files", 10)) // 10은 최대파일개수
   async uploadFile(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body() request: { request: string },
+    @Body() request: { request: string }
   ) {
     const imgurl: string[] = [];
-    // await Promise.all(
-    //   files.map(async (file: Express.Multer.File) => {
-    //     const key = await this.boardsService.uploadImage(file);
-    //     imgurl.push(process.env.AWS_CLOUDFRONT + key);
-    //   }),
-    // );
+    await Promise.all(
+      files.map(async (file: Express.Multer.File) => {
+        const key = await this.boardsService.uploadImage(file);
+        imgurl.push(key);
+      })
+    );
 
     const createBoardDto: CreateBoardDto = JSON.parse(request?.request);
-    return this.boardsService.createBoard(createBoardDto);
+    return this.boardsService.createBoard(createBoardDto, imgurl);
   }
+
+  @Get("/:id")
+  getBoardById(@Param("id") id: number) {
+    return this.boardsService.getBoardById(id);
+  }
+
+  @Delete("/:id")
+  deleteBoard(@Param("id") id: number) {
+    return this.boardsService.deleteBoard(id);
+  }
+
+  //   @Patch('/:id/status')
+  //   updateBoardStatus(@Param('id', ParseIntPipe) id: number, @Body('status', BoardStatusValidationPipe) status: BoardStatus) {
+  //     return this.boardsService.updateBoardStatus(id, status);
+  //   }
+
   // @Get()
   // getAllBoard(@GetUser() user: User): Promise<Board[]> {
   //   this.logger.verbose(`User ${user.username} trying to get all boards`);
@@ -58,17 +76,4 @@ export class BoardsController {
   //       Payload: ${JSON.stringify(createBoardDto)} `);
   //   return this.boardsService.createBoard(createBoardDto, user);
   // }
-
-  //   @Get('/:id')
-  //   getBoardById(@Param('id') id: number): Promise<Board> {
-  //     return this.boardsService.getBoardById(id);
-  //   }
-  //   deleteBoard(@Param('id') id, @GetUser() user: User): Promise<void> {
-  //     return this.boardsService.deleteBoard(id, user);
-  //   }
-
-  //   @Patch('/:id/status')
-  //   updateBoardStatus(@Param('id', ParseIntPipe) id: number, @Body('status', BoardStatusValidationPipe) status: BoardStatus) {
-  //     return this.boardsService.updateBoardStatus(id, status);
-  //   }
 }

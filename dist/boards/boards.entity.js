@@ -26,6 +26,10 @@ __decorate([
     __metadata("design:type", String)
 ], Board.prototype, "contents", void 0);
 __decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], Board.prototype, "imageUrl", void 0);
+__decorate([
     (0, typeorm_1.CreateDateColumn)(),
     __metadata("design:type", Date)
 ], Board.prototype, "created_at", void 0);

@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import * as dotenv from "dotenv";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
@@ -7,6 +8,8 @@ import { UserEntity } from "./user/user.entity";
 import { AuthModule } from "./auth/auth.module";
 import { Board } from "./boards/boards.entity";
 import { BoardsModule } from "./boards/boards.module";
+
+dotenv.config(); // .env 파일을 로드
 
 @Module({
   imports: [

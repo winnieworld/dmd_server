@@ -1,6 +1,6 @@
 /// <reference types="multer" />
-import { Board } from './boards.entity';
-import { BoardsService } from './boards.service';
+import { Board } from "./boards.entity";
+import { BoardsService } from "./boards.service";
 export declare class BoardsController {
     private boardsService;
     private logger;
@@ -16,4 +16,6 @@ export declare class BoardsController {
     uploadFile(files: Express.Multer.File[], request: {
         request: string;
     }): Promise<Board>;
+    getBoardById(id: number): Promise<Board>;
+    deleteBoard(id: number): Promise<void>;
 }

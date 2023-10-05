@@ -19,7 +19,7 @@ const boards_service_1 = require("./boards.service");
 let BoardsController = exports.BoardsController = class BoardsController {
     constructor(boardsService) {
         this.boardsService = boardsService;
-        this.logger = new common_1.Logger('Boards');
+        this.logger = new common_1.Logger("Boards");
     }
     getAllBoard(page = 0) {
         this.logger.verbose(`get all boards`);
@@ -27,28 +27,52 @@ let BoardsController = exports.BoardsController = class BoardsController {
     }
     async uploadFile(files, request) {
         const imgurl = [];
+        await Promise.all(files.map(async (file) => {
+            const key = await this.boardsService.uploadImage(file);
+            imgurl.push(key);
+        }));
         const createBoardDto = JSON.parse(request?.request);
-        return this.boardsService.createBoard(createBoardDto);
+        return this.boardsService.createBoard(createBoardDto, imgurl);
+    }
+    getBoardById(id) {
+        return this.boardsService.getBoardById(id);
+    }
+    deleteBoard(id) {
+        return this.boardsService.deleteBoard(id);
     }
 };
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('page')),
+    __param(0, (0, common_1.Query)("page")),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], BoardsController.prototype, "getAllBoard", null);
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)('files', 10)),
+    (0, common_1.UseInterceptors)((0, platform_express_1.FilesInterceptor)("files", 10)),
     __param(0, (0, common_1.UploadedFiles)()),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Array, Object]),
     __metadata("design:returntype", Promise)
 ], BoardsController.prototype, "uploadFile", null);
+__decorate([
+    (0, common_1.Get)("/:id"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], BoardsController.prototype, "getBoardById", null);
+__decorate([
+    (0, common_1.Delete)("/:id"),
+    __param(0, (0, common_1.Param)("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], BoardsController.prototype, "deleteBoard", null);
 exports.BoardsController = BoardsController = __decorate([
-    (0, common_1.Controller)('boards'),
+    (0, common_1.Controller)("boards"),
     __metadata("design:paramtypes", [boards_service_1.BoardsService])
 ], BoardsController);
 //# sourceMappingURL=boards.controller.js.map

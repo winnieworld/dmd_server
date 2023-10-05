@@ -20,6 +20,9 @@ export class Board extends BaseEntity {
   @Column()
   contents: string;
 
+  @Column()
+  imageUrl: string;
+
   @CreateDateColumn()
   created_at: Date;
 
