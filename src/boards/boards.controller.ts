@@ -12,14 +12,18 @@ import {
   UseInterceptors,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from "@nestjs/common";
+import { AuthGuard } from "@nestjs/passport";
 import { FilesInterceptor } from "@nestjs/platform-express";
+import { GetUser } from "src/auth/get-user.decorator";
+import { UserEntity } from "src/user/user.entity";
 import { Board } from "./boards.entity";
 import { BoardsService } from "./boards.service";
 import { CreateBoardDto } from "./dto/create-board.dto";
 
-// @UseGuards(AuthGuard())
 @Controller("boards")
+@UseGuards(AuthGuard("jwt"))
 export class BoardsController {
   private logger = new Logger("Boards");
   constructor(private boardsService: BoardsService) {}
@@ -34,7 +38,8 @@ export class BoardsController {
   @UseInterceptors(FilesInterceptor("files", 10)) // 10은 최대파일개수
   async uploadFile(
     @UploadedFiles() files: Express.Multer.File[],
-    @Body() request: { request: string }
+    @Body() request: { request: string },
+    @GetUser() user: UserEntity
   ) {
     const imgurl: string[] = [];
     await Promise.all(
@@ -45,7 +50,7 @@ export class BoardsController {
     );
 
     const createBoardDto: CreateBoardDto = JSON.parse(request?.request);
-    return this.boardsService.createBoard(createBoardDto, imgurl);
+    return this.boardsService.createBoard(createBoardDto, imgurl, user);
   }
 
   @Get("/:id")
@@ -54,8 +59,8 @@ export class BoardsController {
   }
 
   @Delete("/:id")
-  deleteBoard(@Param("id") id: number) {
-    return this.boardsService.deleteBoard(id);
+  deleteBoard(@Param("id") id: number, @GetUser() user: UserEntity) {
+    return this.boardsService.deleteBoard(id, user);
   }
 
   //   @Patch('/:id/status')

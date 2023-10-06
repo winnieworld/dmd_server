@@ -15,6 +15,9 @@ export class Board extends BaseEntity {
   id: number;
 
   @Column()
+  nickName: string;
+
+  @Column()
   title: string;
 
   @Column()
@@ -29,10 +32,9 @@ export class Board extends BaseEntity {
   @UpdateDateColumn()
   updated_at: Date;
 
-  // @ManyToOne(
-  //   type => UserEntity,
-  //   user => user.boards,
-  //   { eager: false }
-  // )
-  // user: UserEntity;
+  @ManyToOne((type) => UserEntity, (user) => user.boards, {
+    eager: false,
+    onDelete: "CASCADE",
+  })
+  user: UserEntity;
 }

@@ -16,7 +16,7 @@ import { UserEntity } from "../user/user.entity";
     PassportModule.register({ defaultStrategy: "jwt", session: false }), // 기본 passport 설정
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: "1d" },
+      signOptions: { expiresIn: 3600 },
     }),
     TypeOrmModule.forFeature([UserEntity]),
   ],

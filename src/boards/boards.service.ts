@@ -58,12 +58,18 @@ export class BoardsService {
     };
   }
 
-  async createBoard(createBoardDto: CreateBoardDto, imageUrl: string[]) {
+  async createBoard(
+    createBoardDto: CreateBoardDto,
+    imageUrl: string[],
+    user: UserEntity
+  ) {
     const { title, contents } = createBoardDto;
     const board = await this.boardRepository.create({
       title,
+      nickName: user.nickname,
       contents,
       imageUrl: imageUrl.toString(),
+      user,
     });
 
     await this.boardRepository.save(board);
@@ -80,8 +86,11 @@ export class BoardsService {
     return found;
   }
 
-  async deleteBoard(id: number) {
-    const found = await this.boardRepository.findOne({ where: { id } });
+  async deleteBoard(id: number, user: UserEntity) {
+    const found = await this.boardRepository.findOne({
+      where: { id, user: { id: user.id } },
+    });
+
     const fileKey = found?.imageUrl.substring(
       found?.imageUrl.lastIndexOf("/") + 1
     );

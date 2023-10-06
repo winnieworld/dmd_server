@@ -46,10 +46,6 @@ export class UserEntity {
     this.password = bcrypt.hashSync(this.password, 10);
   }
 
-  // @OneToMany(
-  //   type => Board,
-  //   board => board.user,
-  //   { eager: true }
-  // )
-  // boards: Board[];
+  @OneToMany((type) => Board, (board) => board.user, { eager: true })
+  boards: Board[];
 }
